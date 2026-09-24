@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historias entre generaciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --terracotta: #B85042;
+    --terracotta-dark: #94392D;
+    --sand: #F3EDE3;
+    --sage: #A7BEAE;
+    --sage-dark: #7FA091;
+    --ink: #4A3F38;
+    --ink-soft: #7A6F66;
+    --card: #FFFFFF;
+    --shadow: 0 10px 30px rgba(74, 63, 56, 0.10);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+  }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    padding: 28px 14px 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: -120px;
+    right: -120px;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: var(--sage);
+    opacity: 0.35;
+    z-index: 0;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    bottom: -160px;
+    left: -140px;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: var(--terracotta);
+    opacity: 0.14;
+    z-index: 0;
+  }
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 560px;
+  }
+  h1, .display {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+  }
+  .progress-track {
+    height: 8px;
+    background: rgba(74,63,56,0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 26px;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--sage-dark), var(--terracotta));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    padding: 34px 30px;
+    min-height: 360px;
+    display: none;
+    flex-direction: column;
+    animation: fadeIn 0.45s ease;
+  }
+  .card.active { display: flex; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 18px;
+  }
+  .eyebrow {
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sage-dark);
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .question {
+    font-family: 'Fraunces', serif;
+    font-size: 23px;
+    font-weight: 600;
+    line-height: 1.35;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+  .subtext {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .field-area {
+    flex: 1;
+  }
+  .options label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    margin-bottom: 10px;
+    border: 1.5px solid rgba(74,63,56,0.12);
+    border-radius: 14px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .options label:hover {
+    border-color: var(--sage-dark);
+    background: rgba(167,190,174,0.10);
+  }
+  .options input {
+    accent-color: var(--terracotta);
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .options label:has(input:checked) {
+    border-color: var(--terracotta);
+    background: rgba(184,80,66,0.06);
+  }
+  textarea, input[type="text"] {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid rgba(74,63,56,0.15);
+    border-radius: 14px;
+    font-size: 15px;
+    font-family: 'Nunito', sans-serif;
+    resize: vertical;
+    min-height: 100px;
+    color: var(--ink);
+  }
+  textarea:focus, input:focus {
+    outline: none;
+    border-color: var(--terracotta);
+  }
+  .scale-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .scale-option {
+    flex: 1;
+  }
+  .scale-option label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 4px;
+    border: 1.5px solid rgba(74,63,56,0.12);
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    height: 54px;
+  }
+  .scale-option label:has(input:checked) {
+    border-color: var(--terracotta);
+    background: rgba(184,80,66,0.08);
+    color: var(--terracotta-dark);
+  }
+  .scale-option input { display: none; }
+  .scale-caption {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+  .hint {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: -12px;
+    margin-bottom: 14px;
+  }
+  .nav-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  button {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    border-radius: 14px;
+    border: none;
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.15s ease;
+  }
+  button:active { transform: scale(0.98); }
+  .btn-primary {
+    background: var(--terracotta);
+    color: white;
+    flex: 1;
+  }
+  .btn-primary:hover { background: var(--terracotta-dark); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1.5px solid rgba(74,63,56,0.15);
+  }
+  .btn-secondary:hover { border-color: var(--ink-soft); }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .intro .display {
+    font-size: 27px;
+    line-height: 1.3;
+    margin: 0 0 12px;
+  }
+  .intro p {
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 4px;
+  }
+  .intro .tag {
+    display: inline-block;
+    background: rgba(167,190,174,0.3);
+    color: var(--sage-dark);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+    letter-spacing: 0.03em;
+  }
+  .end .display { font-size: 24px; margin: 4px 0 10px; }
+  .end p { color: var(--ink-soft); font-size: 15px; line-height: 1.6; }
+  .end .icon { margin: 0 auto 18px; }
+  .end { text-align: center; align-items: center; justify-content: center; }
+  .step-counter {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  #error-box {
+    display: none;
+    background: rgba(184,80,66,0.08);
+    color: var(--terracotta-dark);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    margin-top: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+  <form id="survey-form" action="https://formspree.io/f/TU_FORM_ID" method="POST">
+
+    <!-- Intro -->
+    <div class="card intro active" data-step="intro">
+      <svg class="icon" viewBox="0 0 64 64" fill="none">
+        <circle cx="22" cy="22" r="10" fill="#A7BEAE"/>
+        <circle cx="42" cy="26" r="8" fill="#B85042" opacity="0.85"/>
+        <circle cx="30" cy="44" r="12" fill="#F3EDE3" stroke="#B85042" stroke-width="2"/>
+        <path d="M14 54c2-8 8-12 16-12s14 4 16 12" stroke="#4A3F38" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="tag">3 minutos · anónimo</span>
+      <div class="display">Cuéntanos cómo se vive tu familia</div>
+      <p>Esto hace parte de mi proyecto de grado sobre familia y vínculos entre generaciones en Colombia. No hay respuestas correctas ni incorrectas — solo quiero entender un poco tu historia. Tus respuestas son anónimas.</p>
+      <div class="nav-row">
+        <button type="button" class="btn-primary" onclick="goTo(1)">Empezar →</button>
+      </div>
+    </div>
+
+    <!-- 1: edad -->
+    <div class="card" data-step="1">
+      <div class="field-area">
+        <div class="step-counter">Pregunta 1 de 9</div>
+        <div class="question">Para empezar, ¿cuántos años tienes?</div>
+        <div class="options">
+          <label><input type="radio" name="edad" value="Menos de 18" required> Menos de 18</label>
+          <label><input type="radio" name="edad" value="18-25" required> 18 a 25</label>
+          <label><input type="radio" name="edad" value="26-40" required> 26 a 40</label>
+          <label><input type="radio" name="edad" value="41-60" required> 41 a 60</label>
+          <label><input type="radio" name="edad" value="61-75" required> 61 a 75</label>
+          <label><input type="radio" name="edad" value="Más de 75" required> Más de 75</label>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-secondary" onclick="goTo(0)">← Atrás</button>
+        <button type="button" class="btn-primary" onclick="next(1)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- 2: variedad edades familia -->
+    <div class="card" data-step="2">
+      <div class="field-area">
+        <div class="step-counter">Pregunta 2 de 9</div>
+        <svg class="icon" viewBox="0 0 64 64" fill="none">
+          <circle cx="16" cy="30" r="7" fill="#A7BEAE"/>
+          <circle cx="32" cy="24" r="9" fill="#B85042" opacity="0.85"/>
+          <circle cx="49" cy="32" r="6" fill="#F3EDE3" stroke="#B85042" stroke-width="2"/>
+          <path d="M8 48c3-6 8-9 24-9s21 3 24 9" stroke="#4A3F38" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="question">Cuando piensas en tu familia cercana, ¿qué tan mezcladas están las edades?</div>
+        <div class="options">
+          <label><input type="radio" name="variedad_edades_familia" value="Muy variada (niños hasta adultos mayores)" required> Muy variada — hay desde niños hasta adultos mayores</label>
+          <label><input type="radio" name="variedad_edades_familia" value="Variada sin extremos" required> Variada, pero sin extremos</label>
+          <label><input type="radio" name="variedad_edades_familia" value="Bastante pareja y jóvenes" required> Bastante pareja, y más bien jóvenes</label>
+          <label><input type="radio" name="variedad_edades_familia" value="Bastante pareja y mayores" required> Bastante pareja, y más bien mayores</label>
+          <label><input type="radio" name="variedad_edades_familia" value="Vivo solo/a o poco contacto" required> Vivo solo/a o tengo poco contacto familiar</label>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-secondary" onclick="goTo(1)">← Atrás</button>
+        <button type="button" class="btn-primary" onclick="next(2)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- 3: como demuestras carino -->
+    <div class="card" data-step="3">
+      <div class="field-area">
+        <div class="step-counter">Pregunta 3 de 9</div>
+        <svg class="icon" viewBox="0 0 64 64" fill="none">
+          <path d="M32 52S12 40 12 24a11 11 0 0 1 20-6 11 11 0 0 1 20 6c0 16-20 28-20 28Z" fill="#B85042" opacity="0.9"/>
+        </svg>
+        <div class="question">¿Cómo le sueles demostrar cariño a tu familia?</div>
+        <div class="hint">Marca todas las que apliquen.</div>
+        <div class="options" id="q3-options">
+          <label><input type="checkbox" name="demostrar_carino" value="Palabras"> Con palabras — decirlo, elogiar, agradecer</label>
+          <label><input type="checkbox" name="demostrar_carino" value="Tiempo"> Pasando tiempo juntos</label>
+          <label><input type="checkbox" name="demostrar_carino" value="Detalles/regalos"> Con detalles o regalos</label>
+          <label><input type="checkbox" name="demostrar_carino" value="Ayuda práctica"> Ayudando en cosas prácticas</label>
+          <label><input type="checkbox" name="demostrar_carino" value="Contacto físico"> Con contacto físico — abrazos, etc.</label>
+          <label><input type="checkbox" name="demostrar_carino" value="Mensajes/contenido compartido"> Mandando mensajes o compartiendo contenido</label>
+        </div>
+        <div id="err-q3" class="hint" style="color:#94392D; display:none;">Elige al menos una opción para seguir.</div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-secondary" onclick="goTo(2)">← Atrás</button>
+        <button type="button" class="btn-primary" onclick="validateAndNext(3, 'demostrar_carino', 'err-q3')">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- 4: estilo comunicacion -->
+    <div class="card" data-step="4">
+      <div class="field-area">
+        <div class="step-counter">Pregunta 4 de 9</div>
+        <svg class="icon" viewBox="0 0 64 64" fill="none">
+          <rect x="8" y="14" width="38" height="26" rx="8" fill="#A7BEAE"/>
+          <path d="M16 40l-4 10 12-6" fill="#A7BEAE"/>
+          <rect x="24" y="26" width="32" height="22" rx="8" fill="#F3EDE3" stroke="#B85042" stroke-width="2"/>
+          <path d="M48 48l4 8-10-5" fill="#F3EDE3" stroke="#B85042" stroke-width="2"/>
+        </svg>
+        <div class="question">Cuando quieres hablar con alguien de tu familia, ¿cómo prefieres hacerlo?</div>
+        <div class="options">
+          <label><input type="radio" name="estilo_comunicacion" value="Prefiero texto" required> Por mensajes de texto</label>
+          <label><input type="radio" name="estilo_comunicacion" value="Prefiero llamada" required> Por llamada</label>
+          <label><input type="radio" name="estilo_comunicacion" value="Prefiero en persona" required> Cara a cara, en persona</label>
+          <label><input type="radio" name="estilo_comunicacion" value="Depende de quién sea" required> Depende de con quién sea</label>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-secondary" onclick="goTo(3)">← Atrás</button>
+        <button type="button" class="btn-primary" onclick="next(4)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- 5: familiar dificil -->
+    <div class="card" data-step="5">
+      <div class="field-area">
+        <div class="step-counter">Pregunta 5 de 9</div>
+        <div class="question">¿Hay alguien en tu familia con quien te cueste un poco comunicarte?</div>
+        <div class="subtext">Cuéntanos quién es (basta con el parentesco, no hace falta el nombre) y, si quieres, por qué crees que pasa.</div>
+        <textarea name="familiar_dificil_comunicar" placeholder="Por ejemplo: con mi abuelo, porque..." required></textarea>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-secondary" onclick="goTo(4)">← Atrás</button>
+        <button type="button" class="btn-primary" onclick="next(5)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- 6: escala entendimiento -->
+    <div class="card" data-step="6">
+      <div class="field-area">
+        <div class="step-counter">Pregunta 6 de 9</div>
+        <div class="question">¿Qué tan bien te entiendes con personas de una edad muy distinta a la tuya?</div>
+        <div class="scale-row">
+          <div class="scale-option"><label><input type="radio" name="entendimiento_edad_distinta" value="0" required>0</label></div>
+          <div class="scale-option"><label><input type="radio" name="entendimiento_edad_distinta" value="1" required>1</label></div>
+          <div class="scale-option"><label><input type="radio" name="entendimiento_edad_distinta" value="2" required>2</label></div>
+          <div class="scale-option"><label><input type="radio" name="entendimiento_edad_distinta" value="3" required>3</label></div>
+          <div class="scale-option"><label><input type="radio" name="entendimiento_edad_distinta" value="4" required>4</label></div>
+          <div class="scale-option"><label><input type="radio" name="entendimiento_edad_distinta" value="5" required>5</label></div>
+        </div>
+        <div class="scale-caption"><span>Nada</span><span>Muchísimo</span></div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-secondary" onclick="goTo(5)">← Atrás</button>
+        <button type="button" class="btn-primary" onclick="next(6)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- 7: juego de mesa -->
+    <div class="card" data-step="7">
+      <div class="field-area">
+        <div class="step-counter">Pregunta 7 de 9</div>
+        <svg class="icon" viewBox="0 0 64 64" fill="none">
+          <rect x="10" y="10" width="44" height="44" rx="10" fill="#F3EDE3" stroke="#B85042" stroke-width="2"/>
+          <circle cx="24" cy="24" r="3.5" fill="#B85042"/>
+          <circle cx="40" cy="24" r="3.5" fill="#B85042"/>
+          <circle cx="24" cy="40" r="3.5" fill="#B85042"/>
+          <circle cx="40" cy="40" r="3.5" fill="#B85042"/>
+          <circle cx="32" cy="32" r="3.5" fill="#B85042"/>
+        </svg>
+        <div class="question">¿Alguna vez has jugado algo con un familiar mucho mayor o menor que tú?</div>
+        <div class="subtext">Puede ser un juego de mesa, cartas, o lo que se te ocurra. Cuéntanos cómo te fue.</div>
+        <textarea name="jugado_juego_mesa_familiar" placeholder="Cuéntanos brevemente..." required></textarea>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-secondary" onclick="goTo(6)">← Atrás</button>
+        <button type="button" class="btn-primary" onclick="next(7)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- 8: motivacion juego -->
+    <div class="card" data-step="8">
+      <div class="field-area">
+        <div class="step-counter">Pregunta 8 de 9</div>
+        <div class="question">¿Qué te haría querer sentarte a jugar con toda tu familia, de todas las edades?</div>
+        <div class="hint">Elige hasta 2 opciones.</div>
+        <div class="options" id="q8-options">
+          <label><input type="checkbox" name="motivacion_juego" value="Reír juntos"> Reírnos juntos</label>
+          <label><input type="checkbox" name="motivacion_juego" value="Aprender mutuamente"> Aprender algo del otro</label>
+          <label><input type="checkbox" name="motivacion_juego" value="Sacar temas nuevos"> Que salgan temas nuevos de conversación</label>
+          <label><input type="checkbox" name="motivacion_juego" value="Sin pantallas"> Que sea sin pantallas</label>
+          <label><input type="checkbox" name="motivacion_juego" value="Parejo para todas las edades"> Que sea parejo para todas las edades</label>
+          <label><input type="checkbox" name="motivacion_juego" value="Otro"> Otra razón</label>
+        </div>
+        <div id="err-q8" class="hint" style="color:#94392D; display:none;">Elige al menos una opción para seguir.</div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-secondary" onclick="goTo(7)">← Atrás</button>
+        <button type="button" class="btn-primary" onclick="validateAndNext(8, 'motivacion_juego', 'err-q8')">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- 9: cambio tiempo -->
+    <div class="card" data-step="9">
+      <div class="field-area">
+        <div class="step-counter">Pregunta 9 de 9</div>
+        <svg class="icon" viewBox="0 0 64 64" fill="none">
+          <path d="M20 8h24v10c0 8-6 12-12 14 6 2 12 6 12 14v10H20V46c0-8 6-12 12-14-6-2-12-6-12-14Z" fill="#F3EDE3" stroke="#B85042" stroke-width="2"/>
+        </svg>
+        <div class="question">Última: si pudieras cambiar algo en cómo tu familia comparte tiempo junta, ¿qué sería?</div>
+        <textarea name="cambio_tiempo_familia" placeholder="Piensa en voz alta, no hay respuesta perfecta..." required></textarea>
+        <div id="error-box"></div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-secondary" onclick="goTo(8)">← Atrás</button>
+        <button type="submit" class="btn-primary" id="submit-btn">Enviar respuestas ✓</button>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- Thank you -->
+  <div class="card end" data-step="end">
+    <svg class="icon" viewBox="0 0 64 64" fill="none">
+      <path d="M32 54S10 41 10 24a12 12 0 0 1 22-7 12 12 0 0 1 22 7c0 17-22 30-22 30Z" fill="#B85042"/>
+      <path d="M22 30l7 7 14-14" stroke="#F3EDE3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="display">¡Gracias por contarme tu historia!</div>
+    <p>Tu respuesta ya quedó guardada. Cada historia como la tuya ayuda a entender mejor cómo se conectan (o se desconectan) las generaciones en Colombia.</p>
+  </div>
+
+</div>
+
+<script>
+  var steps = ["intro","1","2","3","4","5","6","7","8","9"];
+  var current = 0;
+
+  function getCard(step) {
+    return document.querySelector('.card[data-step="' + step + '"]');
+  }
+
+  function updateProgress() {
+    var pct = current === 0 ? 0 : Math.round((current / (steps.length - 1)) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  function goTo(index) {
+    getCard(steps[current]).classList.remove('active');
+    current = index;
+    getCard(steps[current]).classList.add('active');
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function currentCardValid(stepIndex) {
+    var card = getCard(steps[stepIndex]);
+    var required = card.querySelectorAll('[required]');
+    for (var i = 0; i < required.length; i++) {
+      var field = required[i];
+      if (field.type === 'radio') {
+        var group = card.querySelectorAll('input[name="' + field.name + '"]');
+        var anyChecked = Array.prototype.some.call(group, function (g) { return g.checked; });
+        if (!anyChecked) return false;
+      } else if (!field.value.trim()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function next(stepIndex) {
+    if (!currentCardValid(stepIndex)) {
+      alert('Antes de seguir, responde esta pregunta 🙂');
+      return;
+    }
+    goTo(stepIndex + 1);
+  }
+
+  function validateAndNext(stepIndex, groupName, errId) {
+    var checked = document.querySelectorAll('input[name="' + groupName + '"]:checked');
+    var errEl = document.getElementById(errId);
+    if (checked.length === 0) {
+      errEl.style.display = 'block';
+      return;
+    }
+    errEl.style.display = 'none';
+    goTo(stepIndex + 1);
+  }
+
+  // Límite de 2 selecciones en pregunta 8
+  (function () {
+    var q8 = document.querySelectorAll('#q8-options input[type="checkbox"]');
+    q8.forEach(function (box) {
+      box.addEventListener('change', function () {
+        var checked = document.querySelectorAll('#q8-options input[type="checkbox"]:checked');
+        if (checked.length > 2) box.checked = false;
+      });
+    });
+  })();
+
+  // Envío por fetch, sin salir de la página
+  var form = document.getElementById('survey-form');
+  var submitBtn = document.getElementById('submit-btn');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!currentCardValid(9)) {
+      alert('Antes de enviar, completa la última pregunta 🙂');
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+
+    var formData = new FormData(form);
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    }).then(function (response) {
+      if (response.ok) {
+        form.style.display = 'none';
+        document.querySelector('.progress-track').style.display = 'none';
+        getCard('end').classList.add('active');
+      } else {
+        document.getElementById('error-box').style.display = 'block';
+        document.getElementById('error-box').textContent = 'No se pudo enviar. Intenta de nuevo.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar respuestas ✓';
+      }
+    }).catch(function () {
+      document.getElementById('error-box').style.display = 'block';
+      document.getElementById('error-box').textContent = 'No se pudo enviar. Revisa tu conexión e intenta de nuevo.';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enviar respuestas ✓';
+    });
+  });
+
+  updateProgress();
+</script>
+
+</body>
+</html>
